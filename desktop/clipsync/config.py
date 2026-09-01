@@ -12,6 +12,7 @@ import os
 import platform
 import socket
 import stat
+import sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Optional
@@ -19,6 +20,18 @@ from typing import Optional
 from . import crypto
 
 APP_NAME = "clipsync"
+
+
+def invocation() -> str:
+    """How the user actually launches this build.
+
+    The packaged binaries are run as `clipsync ...`; only a source checkout is
+    run as `python -m clipsync ...`. Messages that tell someone what to type
+    next have to match the build they are holding.
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).stem
+    return "python -m clipsync"
 
 
 def config_dir() -> Path:
@@ -91,7 +104,8 @@ class RoomConfig:
         target = path or config_path()
         if not target.exists():
             raise FileNotFoundError(
-                f"no paired room found at {target}. Run `python -m clipsync pair` first."
+                f"no paired room found at {target}. "
+                f"Run `{invocation()} pair` first."
             )
         if os.name != "nt":
             mode = stat.S_IMODE(target.stat().st_mode)

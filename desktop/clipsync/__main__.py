@@ -13,7 +13,7 @@ from typing import Optional
 
 from . import crypto, pairing
 from .api import SupabaseClient, SupabaseError
-from .config import RoomConfig, config_path, default_device_name
+from .config import RoomConfig, config_path, default_device_name, invocation
 from .listener import ClipboardListener, fetch_devices
 
 DIM = "\033[2m"
@@ -25,7 +25,7 @@ RESET = "\033[0m"
 
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="clipsync",
+        prog=invocation(),
         description="Zero-knowledge clipboard sync between this computer and your phone.",
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="debug logging")
@@ -108,7 +108,7 @@ def cmd_pair(args) -> int:
     print(f"  QR image      {png_path}")
     print(f"  key stored at {config_path()} {DIM}(mode 600, never uploaded){RESET}")
     print()
-    print(f"  Then start syncing:  {BOLD}python -m clipsync run{RESET}")
+    print(f"  Then start syncing:  {BOLD}{invocation()} run{RESET}")
     print()
     return 0
 
