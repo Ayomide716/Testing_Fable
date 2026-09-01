@@ -1,7 +1,13 @@
 name: Deploy download page
 
-# Publishes web/ to GitHub Pages. The first run enables Pages itself via the
-# configure-pages `enablement` input, so no manual Settings change is needed.
+# Publishes web/ to GitHub Pages.
+#
+# One-time setup, which only a repo admin can do:
+#   Settings → Pages → Source: GitHub Actions
+# The `enablement` input below tries to do it automatically, but creating a
+# Pages site needs admin rights that GITHUB_TOKEN does not have, so it fails
+# with "Resource not accessible by integration" until the switch is flipped by
+# hand. Once Pages exists, enablement is a no-op and every run deploys.
 
 on:
   push:
@@ -35,8 +41,7 @@ jobs:
           ! grep -qE '<(script|link)[^>]+(src|href)="[^"#]*\.(js|css)"' web/index.html \
             || (echo "web/index.html gained an external local asset" && exit 1)
 
-      # enablement turns Pages on through the API on the first run, so the
-      # repo needs no manual Settings change to go live.
+      # Succeeds once Pages exists; cannot create it (see the note above).
       - uses: actions/configure-pages@v5
         with:
           enablement: true
