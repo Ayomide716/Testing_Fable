@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing tag to build and attach assets to'
+        description: 'Version to publish, e.g. v0.1.0. Created if it does not exist.'
         required: true
 
 permissions:
@@ -42,9 +42,9 @@ jobs:
             archive: zip
 
     steps:
+      # Builds the ref the run started on: the tag for a tag push, the chosen
+      # branch for a manual run (whose tag may not exist yet).
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.tag || github.ref }}
 
       - uses: actions/setup-python@v5
         with:
@@ -127,6 +127,9 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag || github.ref_name }}
+          # Creates the tag at this commit when it does not already exist, so a
+          # release can be cut without a separate tag push.
+          target_commitish: ${{ github.sha }}
           files: artifacts/*
           generate_release_notes: true
           fail_on_unmatched_files: true
