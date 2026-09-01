@@ -1,0 +1,956 @@
+<title>ClipSync Downloads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+  /* ClipSync commits to one visual world: the dark, neon-edged surface the
+     app itself ships with (mobile/tailwind.config.js). Single theme by
+     choice, so every colour is painted explicitly and the page holds on any
+     host ground. */
+  :root {
+    --void: #05060B;
+    --panel: #0B0E17;
+    --panel-2: #10151F;
+    --edge: rgba(255, 255, 255, 0.09);
+    --edge-lit: rgba(34, 211, 238, 0.35);
+    --ink: #E8EDF7;
+    --muted: #7E8AA0;
+    --dim: #55607A;
+    --cyan: #22D3EE;
+    --violet: #A78BFA;
+    --amber: #FCD34D;
+    --rose: #FB7185;
+
+    --display: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+    --body: 'Instrument Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    --col: 74ch;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--void);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Ambient bloom, the same two lights the app's Aurora backdrop uses. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: -20% -10% auto -10%;
+    height: 70vh;
+    background:
+      radial-gradient(38rem 26rem at 18% 0%, rgba(34, 211, 238, 0.16), transparent 70%),
+      radial-gradient(34rem 24rem at 82% 12%, rgba(167, 139, 250, 0.14), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+    width: min(100% - 2.5rem, var(--col));
+    margin-inline: auto;
+  }
+
+  a { color: var(--cyan); text-decoration-color: rgba(34, 211, 238, 0.4); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* --- masthead ---------------------------------------------------------- */
+
+  .masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.75rem 0 0;
+    flex-wrap: wrap;
+  }
+
+  .wordmark {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .wordmark .beacon {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14);
+  }
+
+  .masthead nav {
+    display: flex;
+    gap: 1.4rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+  }
+
+  .masthead nav a { color: var(--muted); text-decoration: none; }
+  .masthead nav a:hover { color: var(--ink); }
+
+  /* --- hero -------------------------------------------------------------- */
+
+  .hero { padding: 4.5rem 0 3.5rem; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin: 0 0 1.1rem;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.4rem, 7.5vw, 3.9rem);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    margin: 0 0 1.25rem;
+  }
+
+  h1 .quiet { color: var(--muted); }
+
+  .lede {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 54ch;
+    margin: 0 0 2rem;
+  }
+
+  .lede strong { color: var(--ink); font-weight: 500; }
+
+  /* --- primary download -------------------------------------------------- */
+
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.9rem 1.2rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: var(--cyan);
+    color: #04070C;
+    font-family: var(--body);
+    font-size: 0.98rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 0 32px rgba(34, 211, 238, 0.28);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 0 40px rgba(34, 211, 238, 0.4); }
+
+  .btn.ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--edge);
+    box-shadow: none;
+  }
+
+  .btn.ghost:hover { border-color: var(--edge-lit); }
+
+  .cta-note {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--dim);
+  }
+
+  /* --- terminal ---------------------------------------------------------- */
+
+  .terminal {
+    margin-top: 3rem;
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(0,0,0,0.25));
+    overflow: hidden;
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--edge);
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--dim);
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .terminal-bar .dots { display: flex; gap: 0.35rem; }
+  .terminal-bar .dots i {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    display: block;
+  }
+
+  .terminal-body {
+    padding: 1.1rem 1rem 1.3rem;
+    display: grid;
+    gap: 1rem 1.35rem;
+    align-items: start;
+  }
+
+  @media (min-width: 40rem) {
+    .terminal-body { grid-template-columns: 11.5rem 1fr; }
+  }
+
+  .terminal-body pre {
+    margin: 0;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  /* A real QR of a sample pairing payload — the same matrix the CLI draws,
+     rendered as vector modules so it never depends on a font's block glyphs. */
+  .qr {
+    width: 11.5rem;
+    max-width: 100%;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: #0A0D14;
+    border: 1px solid var(--edge);
+  }
+
+  .qr svg { display: block; width: 100%; height: auto; }
+
+  .prompt { color: var(--cyan); }
+  .val { color: var(--ink); }
+  .key { color: var(--violet); }
+
+  /* --- sections ---------------------------------------------------------- */
+
+  section { padding: 3.75rem 0; border-top: 1px solid var(--edge); }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .step-no {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1.45rem, 4vw, 1.85rem);
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .section-note {
+    color: var(--muted);
+    max-width: 60ch;
+    margin: -0.75rem 0 2rem;
+  }
+
+  /* --- download grid ----------------------------------------------------- */
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.9rem;
+  }
+
+  .dl {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.15rem 1.2rem 1.25rem;
+    border: 1px solid var(--edge);
+    border-radius: 12px;
+    background: var(--panel);
+  }
+
+  .dl[data-current='true'] {
+    border-color: var(--edge-lit);
+    background: linear-gradient(180deg, rgba(34, 211, 238, 0.07), rgba(11, 14, 23, 1));
+  }
+
+  .dl-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .dl h3 {
+    margin: 0;
+    font-family: var(--body);
+    font-size: 1.02rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    border: 1px solid var(--edge);
+    color: var(--dim);
+    white-space: nowrap;
+  }
+
+  .tag.here { color: var(--cyan); border-color: var(--edge-lit); }
+
+  .dl .meta {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--dim);
+    font-variant-numeric: tabular-nums;
+    margin: 0;
+  }
+
+  .dl .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-top: auto;
+    padding-top: 0.55rem;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+  }
+
+  .dl .links a { text-decoration: none; border-bottom: 1px solid rgba(34, 211, 238, 0.35); }
+  .dl .links a:hover { border-bottom-color: var(--cyan); }
+
+  .pending {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--dim);
+  }
+
+  /* --- ciphertext ledger ------------------------------------------------- */
+
+  .ledger {
+    border: 1px solid var(--edge);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .ledger-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-bottom: 1px solid var(--edge);
+  }
+
+  .ledger-row:last-child { border-bottom: 0; }
+
+  .ledger-cell { padding: 0.85rem 1rem; min-width: 0; }
+
+  .ledger-cell.plain { background: rgba(255, 255, 255, 0.02); }
+  .ledger-cell.cipher { background: rgba(0, 0, 0, 0.28); overflow-x: auto; }
+
+  .ledger-cell .who {
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .ledger-cell.cipher .who { color: var(--violet); }
+
+  .ledger-cell p {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    word-break: break-all;
+  }
+
+  .ledger-cell.cipher p { color: var(--violet); }
+
+  @media (min-width: 46rem) {
+    .ledger-row { grid-template-columns: 1fr 1.35fr; }
+    .ledger-cell.plain { border-right: 1px solid var(--edge); }
+  }
+
+  /* --- steps ------------------------------------------------------------- */
+
+  ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.1rem; }
+
+  ol.steps li {
+    display: grid;
+    grid-template-columns: 2.1rem 1fr;
+    gap: 0.9rem;
+    align-items: start;
+  }
+
+  ol.steps .n {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--cyan);
+    padding-top: 0.12rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  ol.steps h3 {
+    margin: 0 0 0.2rem;
+    font-family: var(--body);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  ol.steps p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    color: var(--ink);
+  }
+
+  .snippet {
+    margin: 1.25rem 0 0;
+    padding: 0.95rem 1.05rem;
+    border: 1px solid var(--edge);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .snippet .prompt { user-select: none; }
+
+  /* --- honesty panel ----------------------------------------------------- */
+
+  .caveat {
+    display: flex;
+    gap: 0.85rem;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid rgba(252, 211, 77, 0.28);
+    border-radius: 12px;
+    background: rgba(252, 211, 77, 0.05);
+  }
+
+  .caveat .mark { color: var(--amber); font-family: var(--mono); font-size: 0.9rem; }
+  .caveat p { margin: 0; font-size: 0.92rem; color: #D8CFAE; }
+  .caveat p + p { margin-top: 0.5rem; }
+
+  /* --- footer ------------------------------------------------------------ */
+
+  footer {
+    border-top: 1px solid var(--edge);
+    padding: 2.25rem 0 3.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--dim);
+  }
+
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--cyan); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <a class="wordmark" href="#top"><span class="beacon"></span>ClipSync</a>
+    <nav>
+      <a href="#downloads">Downloads</a>
+      <a href="#how">How it works</a>
+      <a href="#verify">Verify</a>
+      <a href="https://github.com/Ayomide716/Testing_Fable">Source</a>
+    </nav>
+  </header>
+
+  <div class="hero" id="top">
+    <p class="eyebrow">Zero-knowledge clipboard</p>
+    <h1>Copy on your computer.<br><span class="quiet">Paste on your phone.</span></h1>
+    <p class="lede">
+      ClipSync pairs a desktop agent with your phone over a single QR scan. Everything
+      that crosses the network is sealed with <strong>AES-256-GCM</strong> under a key
+      that never leaves the two devices — <strong>the server stores ciphertext and
+      nothing else</strong>.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn" id="primary-download" href="#downloads">
+        <span id="primary-label">Get ClipSync</span>
+      </a>
+      <a class="btn ghost" href="#how">How pairing works</a>
+      <span class="cta-note" id="primary-note">Desktop agent · Python 3.9+</span>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span>workstation — python -m clipsync pair</span>
+      </div>
+      <div class="terminal-body">
+        <div class="qr">
+          <svg viewBox="0 0 61 61" role="img" aria-label="Pairing QR code" shape-rendering="crispEdges">
+            <rect width="61" height="61" fill="#0A0D14"></rect>
+            <path d="M2 2h7v1h-7zM11 2h1v1h-1zM13 2h2v1h-2zM16 2h1v1h-1zM19 2h1v1h-1zM23 2h2v1h-2zM26 2h1v1h-1zM31 2h2v1h-2zM34 2h1v1h-1zM37 2h3v1h-3zM41 2h4v1h-4zM46 2h1v1h-1zM48 2h2v1h-2zM52 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM10 3h2v1h-2zM15 3h1v1h-1zM17 3h1v1h-1zM20 3h1v1h-1zM22 3h2v1h-2zM25 3h2v1h-2zM28 3h1v1h-1zM36 3h1v1h-1zM38 3h1v1h-1zM40 3h1v1h-1zM42 3h1v1h-1zM44 3h1v1h-1zM47 3h1v1h-1zM49 3h1v1h-1zM52 3h1v1h-1zM58 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM11 4h1v1h-1zM13 4h1v1h-1zM15 4h1v1h-1zM17 4h1v1h-1zM20 4h1v1h-1zM23 4h2v1h-2zM26 4h3v1h-3zM30 4h1v1h-1zM32 4h4v1h-4zM37 4h1v1h-1zM40 4h3v1h-3zM45 4h5v1h-5zM52 4h1v1h-1zM54 4h3v1h-3zM58 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM10 5h1v1h-1zM19 5h2v1h-2zM23 5h1v1h-1zM25 5h3v1h-3zM29 5h1v1h-1zM32 5h1v1h-1zM36 5h1v1h-1zM38 5h1v1h-1zM40 5h1v1h-1zM47 5h1v1h-1zM49 5h1v1h-1zM52 5h1v1h-1zM54 5h3v1h-3zM58 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM12 6h2v1h-2zM15 6h3v1h-3zM20 6h3v1h-3zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h6v1h-6zM38 6h1v1h-1zM41 6h1v1h-1zM44 6h1v1h-1zM46 6h1v1h-1zM49 6h1v1h-1zM52 6h1v1h-1zM54 6h3v1h-3zM58 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h2v1h-2zM16 7h1v1h-1zM19 7h2v1h-2zM22 7h2v1h-2zM25 7h2v1h-2zM28 7h1v1h-1zM32 7h3v1h-3zM36 7h3v1h-3zM40 7h1v1h-1zM47 7h2v1h-2zM52 7h1v1h-1zM58 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM30 8h1v1h-1zM32 8h1v1h-1zM34 8h1v1h-1zM36 8h1v1h-1zM38 8h1v1h-1zM40 8h1v1h-1zM42 8h1v1h-1zM44 8h1v1h-1zM46 8h1v1h-1zM48 8h1v1h-1zM50 8h1v1h-1zM52 8h7v1h-7zM12 9h1v1h-1zM15 9h1v1h-1zM17 9h1v1h-1zM19 9h4v1h-4zM26 9h1v1h-1zM28 9h1v1h-1zM32 9h1v1h-1zM34 9h3v1h-3zM39 9h4v1h-4zM44 9h1v1h-1zM46 9h1v1h-1zM50 9h1v1h-1zM2 10h5v1h-5zM8 10h4v1h-4zM13 10h1v1h-1zM15 10h1v1h-1zM17 10h4v1h-4zM22 10h1v1h-1zM28 10h6v1h-6zM37 10h4v1h-4zM43 10h3v1h-3zM49 10h1v1h-1zM51 10h1v1h-1zM53 10h1v1h-1zM55 10h1v1h-1zM57 10h1v1h-1zM3 11h5v1h-5zM12 11h1v1h-1zM14 11h1v1h-1zM19 11h1v1h-1zM21 11h1v1h-1zM23 11h4v1h-4zM28 11h6v1h-6zM38 11h2v1h-2zM42 11h3v1h-3zM46 11h1v1h-1zM49 11h3v1h-3zM53 11h2v1h-2zM57 11h1v1h-1zM2 12h1v1h-1zM4 12h1v1h-1zM8 12h4v1h-4zM13 12h1v1h-1zM15 12h2v1h-2zM18 12h1v1h-1zM20 12h1v1h-1zM22 12h1v1h-1zM24 12h1v1h-1zM29 12h1v1h-1zM34 12h7v1h-7zM45 12h4v1h-4zM50 12h1v1h-1zM53 12h3v1h-3zM57 12h1v1h-1zM3 13h1v1h-1zM5 13h2v1h-2zM10 13h2v1h-2zM14 13h1v1h-1zM16 13h2v1h-2zM19 13h2v1h-2zM23 13h2v1h-2zM26 13h1v1h-1zM30 13h2v1h-2zM33 13h3v1h-3zM37 13h1v1h-1zM39 13h1v1h-1zM42 13h5v1h-5zM48 13h3v1h-3zM52 13h3v1h-3zM56 13h2v1h-2zM3 14h1v1h-1zM7 14h2v1h-2zM11 14h1v1h-1zM13 14h1v1h-1zM15 14h3v1h-3zM20 14h3v1h-3zM24 14h6v1h-6zM33 14h1v1h-1zM36 14h3v1h-3zM40 14h2v1h-2zM43 14h2v1h-2zM53 14h1v1h-1zM58 14h1v1h-1zM2 15h2v1h-2zM5 15h1v1h-1zM7 15h1v1h-1zM10 15h3v1h-3zM19 15h3v1h-3zM23 15h1v1h-1zM25 15h2v1h-2zM28 15h1v1h-1zM31 15h3v1h-3zM35 15h1v1h-1zM38 15h1v1h-1zM42 15h1v1h-1zM44 15h1v1h-1zM46 15h2v1h-2zM49 15h2v1h-2zM55 15h1v1h-1zM57 15h2v1h-2zM3 16h2v1h-2zM6 16h1v1h-1zM8 16h1v1h-1zM10 16h1v1h-1zM14 16h3v1h-3zM23 16h1v1h-1zM26 16h1v1h-1zM28 16h1v1h-1zM31 16h1v1h-1zM33 16h1v1h-1zM35 16h2v1h-2zM38 16h4v1h-4zM43 16h1v1h-1zM47 16h3v1h-3zM51 16h3v1h-3zM9 17h1v1h-1zM11 17h1v1h-1zM13 17h1v1h-1zM15 17h4v1h-4zM21 17h4v1h-4zM30 17h1v1h-1zM32 17h1v1h-1zM34 17h6v1h-6zM41 17h1v1h-1zM44 17h1v1h-1zM46 17h1v1h-1zM49 17h1v1h-1zM52 17h3v1h-3zM56 17h3v1h-3zM3 18h1v1h-1zM5 18h1v1h-1zM7 18h2v1h-2zM10 18h3v1h-3zM15 18h1v1h-1zM18 18h1v1h-1zM20 18h1v1h-1zM22 18h2v1h-2zM25 18h1v1h-1zM28 18h1v1h-1zM32 18h1v1h-1zM35 18h4v1h-4zM40 18h1v1h-1zM43 18h3v1h-3zM47 18h1v1h-1zM51 18h1v1h-1zM55 18h1v1h-1zM57 18h1v1h-1zM2 19h2v1h-2zM5 19h3v1h-3zM10 19h2v1h-2zM16 19h2v1h-2zM23 19h2v1h-2zM26 19h5v1h-5zM32 19h1v1h-1zM37 19h3v1h-3zM44 19h1v1h-1zM49 19h3v1h-3zM53 19h2v1h-2zM58 19h1v1h-1zM3 20h1v1h-1zM5 20h2v1h-2zM8 20h1v1h-1zM11 20h1v1h-1zM20 20h2v1h-2zM23 20h1v1h-1zM26 20h1v1h-1zM28 20h2v1h-2zM31 20h1v1h-1zM33 20h2v1h-2zM43 20h1v1h-1zM45 20h2v1h-2zM50 20h1v1h-1zM54 20h1v1h-1zM56 20h2v1h-2zM3 21h1v1h-1zM5 21h1v1h-1zM9 21h1v1h-1zM13 21h1v1h-1zM15 21h1v1h-1zM17 21h1v1h-1zM19 21h2v1h-2zM22 21h3v1h-3zM26 21h2v1h-2zM29 21h2v1h-2zM32 21h1v1h-1zM34 21h3v1h-3zM39 21h2v1h-2zM42 21h1v1h-1zM44 21h3v1h-3zM48 21h6v1h-6zM55 21h3v1h-3zM3 22h1v1h-1zM8 22h1v1h-1zM10 22h2v1h-2zM14 22h1v1h-1zM17 22h1v1h-1zM20 22h2v1h-2zM26 22h1v1h-1zM28 22h1v1h-1zM31 22h1v1h-1zM37 22h5v1h-5zM47 22h1v1h-1zM55 22h1v1h-1zM2 23h2v1h-2zM5 23h2v1h-2zM9 23h3v1h-3zM13 23h3v1h-3zM18 23h2v1h-2zM23 23h3v1h-3zM27 23h2v1h-2zM30 23h5v1h-5zM37 23h2v1h-2zM43 23h2v1h-2zM46 23h2v1h-2zM50 23h1v1h-1zM53 23h6v1h-6zM4 24h1v1h-1zM8 24h2v1h-2zM11 24h1v1h-1zM13 24h2v1h-2zM17 24h2v1h-2zM21 24h1v1h-1zM24 24h1v1h-1zM28 24h2v1h-2zM35 24h2v1h-2zM38 24h1v1h-1zM40 24h1v1h-1zM42 24h1v1h-1zM45 24h1v1h-1zM47 24h2v1h-2zM50 24h1v1h-1zM52 24h1v1h-1zM55 24h3v1h-3zM2 25h1v1h-1zM4 25h4v1h-4zM9 25h1v1h-1zM11 25h2v1h-2zM16 25h1v1h-1zM18 25h3v1h-3zM23 25h3v1h-3zM27 25h4v1h-4zM32 25h1v1h-1zM34 25h1v1h-1zM36 25h2v1h-2zM42 25h2v1h-2zM46 25h1v1h-1zM48 25h1v1h-1zM50 25h1v1h-1zM52 25h6v1h-6zM3 26h3v1h-3zM8 26h1v1h-1zM11 26h1v1h-1zM14 26h2v1h-2zM17 26h4v1h-4zM22 26h1v1h-1zM29 26h1v1h-1zM31 26h3v1h-3zM36 26h3v1h-3zM40 26h1v1h-1zM43 26h3v1h-3zM49 26h1v1h-1zM51 26h2v1h-2zM55 26h1v1h-1zM58 26h1v1h-1zM3 27h1v1h-1zM6 27h1v1h-1zM9 27h3v1h-3zM14 27h2v1h-2zM20 27h1v1h-1zM23 27h2v1h-2zM26 27h1v1h-1zM31 27h2v1h-2zM37 27h3v1h-3zM41 27h4v1h-4zM46 27h1v1h-1zM50 27h1v1h-1zM54 27h1v1h-1zM56 27h1v1h-1zM2 28h1v1h-1zM4 28h1v1h-1zM6 28h5v1h-5zM13 28h1v1h-1zM15 28h1v1h-1zM18 28h2v1h-2zM22 28h2v1h-2zM26 28h11v1h-11zM38 28h1v1h-1zM40 28h2v1h-2zM47 28h2v1h-2zM50 28h5v1h-5zM57 28h1v1h-1zM2 29h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM10 29h1v1h-1zM12 29h2v1h-2zM15 29h2v1h-2zM22 29h1v1h-1zM25 29h1v1h-1zM28 29h1v1h-1zM32 29h3v1h-3zM36 29h2v1h-2zM40 29h1v1h-1zM42 29h1v1h-1zM44 29h1v1h-1zM46 29h2v1h-2zM49 29h2v1h-2zM54 29h3v1h-3zM58 29h1v1h-1zM5 30h2v1h-2zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM14 30h1v1h-1zM18 30h2v1h-2zM23 30h1v1h-1zM25 30h1v1h-1zM28 30h1v1h-1zM30 30h1v1h-1zM32 30h2v1h-2zM37 30h2v1h-2zM44 30h1v1h-1zM47 30h2v1h-2zM50 30h1v1h-1zM52 30h1v1h-1zM54 30h2v1h-2zM58 30h1v1h-1zM3 31h1v1h-1zM6 31h1v1h-1zM10 31h2v1h-2zM13 31h4v1h-4zM20 31h2v1h-2zM25 31h4v1h-4zM32 31h4v1h-4zM37 31h2v1h-2zM41 31h1v1h-1zM44 31h1v1h-1zM47 31h1v1h-1zM50 31h1v1h-1zM54 31h4v1h-4zM2 32h1v1h-1zM4 32h1v1h-1zM6 32h5v1h-5zM12 32h1v1h-1zM14 32h5v1h-5zM20 32h1v1h-1zM22 32h1v1h-1zM24 32h2v1h-2zM27 32h6v1h-6zM36 32h1v1h-1zM39 32h3v1h-3zM43 32h1v1h-1zM45 32h2v1h-2zM48 32h1v1h-1zM50 32h6v1h-6zM57 32h1v1h-1zM4 33h4v1h-4zM10 33h2v1h-2zM13 33h1v1h-1zM21 33h1v1h-1zM23 33h1v1h-1zM25 33h2v1h-2zM34 33h1v1h-1zM39 33h1v1h-1zM42 33h3v1h-3zM49 33h1v1h-1zM51 33h3v1h-3zM55 33h3v1h-3zM2 34h2v1h-2zM6 34h1v1h-1zM8 34h2v1h-2zM11 34h2v1h-2zM16 34h1v1h-1zM20 34h4v1h-4zM25 34h1v1h-1zM27 34h1v1h-1zM29 34h4v1h-4zM35 34h1v1h-1zM37 34h2v1h-2zM45 34h1v1h-1zM48 34h1v1h-1zM51 34h1v1h-1zM54 34h1v1h-1zM57 34h1v1h-1zM2 35h1v1h-1zM6 35h2v1h-2zM10 35h1v1h-1zM12 35h1v1h-1zM19 35h1v1h-1zM21 35h1v1h-1zM23 35h2v1h-2zM26 35h1v1h-1zM31 35h2v1h-2zM34 35h1v1h-1zM38 35h1v1h-1zM41 35h1v1h-1zM43 35h3v1h-3zM49 35h1v1h-1zM51 35h1v1h-1zM53 35h1v1h-1zM56 35h3v1h-3zM6 36h1v1h-1zM8 36h1v1h-1zM10 36h1v1h-1zM12 36h2v1h-2zM15 36h3v1h-3zM19 36h3v1h-3zM24 36h2v1h-2zM27 36h2v1h-2zM31 36h2v1h-2zM35 36h2v1h-2zM39 36h3v1h-3zM46 36h6v1h-6zM53 36h3v1h-3zM2 37h3v1h-3zM6 37h1v1h-1zM9 37h2v1h-2zM13 37h2v1h-2zM16 37h3v1h-3zM20 37h2v1h-2zM26 37h1v1h-1zM31 37h1v1h-1zM34 37h1v1h-1zM36 37h2v1h-2zM39 37h4v1h-4zM46 37h2v1h-2zM49 37h1v1h-1zM52 37h5v1h-5zM58 37h1v1h-1zM3 38h1v1h-1zM6 38h1v1h-1zM8 38h2v1h-2zM13 38h1v1h-1zM19 38h2v1h-2zM25 38h3v1h-3zM29 38h2v1h-2zM32 38h2v1h-2zM35 38h2v1h-2zM38 38h4v1h-4zM44 38h2v1h-2zM47 38h2v1h-2zM50 38h1v1h-1zM52 38h2v1h-2zM55 38h2v1h-2zM58 38h1v1h-1zM2 39h3v1h-3zM6 39h2v1h-2zM9 39h2v1h-2zM12 39h2v1h-2zM16 39h2v1h-2zM21 39h3v1h-3zM26 39h1v1h-1zM28 39h2v1h-2zM31 39h1v1h-1zM38 39h2v1h-2zM41 39h1v1h-1zM43 39h4v1h-4zM49 39h1v1h-1zM52 39h1v1h-1zM57 39h2v1h-2zM2 40h9v1h-9zM13 40h1v1h-1zM15 40h1v1h-1zM22 40h1v1h-1zM24 40h5v1h-5zM32 40h1v1h-1zM35 40h4v1h-4zM40 40h2v1h-2zM43 40h1v1h-1zM48 40h2v1h-2zM57 40h2v1h-2zM2 41h3v1h-3zM6 41h2v1h-2zM12 41h1v1h-1zM17 41h1v1h-1zM21 41h2v1h-2zM24 41h1v1h-1zM26 41h1v1h-1zM29 41h3v1h-3zM36 41h1v1h-1zM40 41h5v1h-5zM46 41h1v1h-1zM48 41h6v1h-6zM55 41h2v1h-2zM2 42h2v1h-2zM6 42h1v1h-1zM8 42h1v1h-1zM10 42h1v1h-1zM12 42h1v1h-1zM14 42h4v1h-4zM19 42h4v1h-4zM30 42h2v1h-2zM33 42h1v1h-1zM35 42h7v1h-7zM43 42h2v1h-2zM48 42h1v1h-1zM53 42h2v1h-2zM56 42h1v1h-1zM3 43h2v1h-2zM7 43h1v1h-1zM10 43h1v1h-1zM13 43h1v1h-1zM15 43h2v1h-2zM23 43h2v1h-2zM26 43h1v1h-1zM28 43h1v1h-1zM31 43h1v1h-1zM35 43h1v1h-1zM38 43h2v1h-2zM41 43h2v1h-2zM44 43h1v1h-1zM47 43h1v1h-1zM49 43h2v1h-2zM52 43h1v1h-1zM55 43h2v1h-2zM2 44h1v1h-1zM5 44h4v1h-4zM11 44h3v1h-3zM16 44h3v1h-3zM20 44h1v1h-1zM22 44h1v1h-1zM24 44h1v1h-1zM31 44h2v1h-2zM34 44h9v1h-9zM45 44h4v1h-4zM51 44h1v1h-1zM54 44h1v1h-1zM57 44h1v1h-1zM2 45h6v1h-6zM10 45h3v1h-3zM15 45h1v1h-1zM17 45h1v1h-1zM19 45h2v1h-2zM23 45h2v1h-2zM26 45h1v1h-1zM28 45h2v1h-2zM33 45h4v1h-4zM40 45h1v1h-1zM42 45h3v1h-3zM46 45h3v1h-3zM51 45h3v1h-3zM56 45h2v1h-2zM2 46h4v1h-4zM8 46h1v1h-1zM15 46h2v1h-2zM18 46h1v1h-1zM20 46h3v1h-3zM24 46h2v1h-2zM27 46h1v1h-1zM29 46h2v1h-2zM32 46h2v1h-2zM37 46h3v1h-3zM44 46h2v1h-2zM47 46h2v1h-2zM50 46h1v1h-1zM52 46h1v1h-1zM54 46h1v1h-1zM58 46h1v1h-1zM11 47h1v1h-1zM17 47h1v1h-1zM19 47h3v1h-3zM23 47h1v1h-1zM26 47h1v1h-1zM28 47h1v1h-1zM34 47h1v1h-1zM38 47h1v1h-1zM41 47h1v1h-1zM43 47h2v1h-2zM46 47h2v1h-2zM50 47h2v1h-2zM53 47h1v1h-1zM55 47h1v1h-1zM57 47h2v1h-2zM2 48h1v1h-1zM4 48h1v1h-1zM7 48h2v1h-2zM11 48h1v1h-1zM15 48h3v1h-3zM21 48h1v1h-1zM23 48h1v1h-1zM25 48h3v1h-3zM29 48h1v1h-1zM31 48h7v1h-7zM40 48h1v1h-1zM47 48h2v1h-2zM50 48h2v1h-2zM54 48h4v1h-4zM2 49h5v1h-5zM12 49h3v1h-3zM20 49h1v1h-1zM22 49h3v1h-3zM26 49h3v1h-3zM34 49h1v1h-1zM36 49h4v1h-4zM42 49h6v1h-6zM49 49h1v1h-1zM51 49h3v1h-3zM55 49h3v1h-3zM8 50h1v1h-1zM10 50h1v1h-1zM12 50h3v1h-3zM19 50h2v1h-2zM22 50h1v1h-1zM25 50h1v1h-1zM28 50h5v1h-5zM36 50h4v1h-4zM41 50h1v1h-1zM43 50h3v1h-3zM48 50h1v1h-1zM50 50h7v1h-7zM10 51h3v1h-3zM16 51h1v1h-1zM19 51h1v1h-1zM21 51h1v1h-1zM23 51h2v1h-2zM26 51h3v1h-3zM32 51h2v1h-2zM35 51h1v1h-1zM37 51h1v1h-1zM39 51h1v1h-1zM41 51h1v1h-1zM43 51h2v1h-2zM46 51h2v1h-2zM50 51h1v1h-1zM54 51h1v1h-1zM57 51h1v1h-1zM2 52h7v1h-7zM10 52h2v1h-2zM17 52h3v1h-3zM21 52h3v1h-3zM25 52h1v1h-1zM27 52h2v1h-2zM30 52h1v1h-1zM32 52h3v1h-3zM36 52h3v1h-3zM40 52h3v1h-3zM44 52h1v1h-1zM48 52h3v1h-3zM52 52h1v1h-1zM54 52h1v1h-1zM57 52h1v1h-1zM2 53h1v1h-1zM8 53h1v1h-1zM12 53h1v1h-1zM14 53h2v1h-2zM22 53h3v1h-3zM26 53h1v1h-1zM28 53h1v1h-1zM32 53h4v1h-4zM37 53h1v1h-1zM42 53h5v1h-5zM50 53h1v1h-1zM54 53h1v1h-1zM56 53h3v1h-3zM2 54h1v1h-1zM4 54h3v1h-3zM8 54h1v1h-1zM10 54h8v1h-8zM19 54h3v1h-3zM23 54h1v1h-1zM26 54h7v1h-7zM36 54h1v1h-1zM38 54h4v1h-4zM44 54h1v1h-1zM50 54h6v1h-6zM58 54h1v1h-1zM2 55h1v1h-1zM4 55h3v1h-3zM8 55h1v1h-1zM10 55h1v1h-1zM12 55h1v1h-1zM18 55h3v1h-3zM24 55h2v1h-2zM27 55h1v1h-1zM30 55h1v1h-1zM33 55h1v1h-1zM35 55h1v1h-1zM37 55h3v1h-3zM43 55h2v1h-2zM46 55h1v1h-1zM52 55h1v1h-1zM54 55h1v1h-1zM2 56h1v1h-1zM4 56h3v1h-3zM8 56h1v1h-1zM10 56h1v1h-1zM14 56h2v1h-2zM17 56h2v1h-2zM21 56h1v1h-1zM24 56h1v1h-1zM27 56h3v1h-3zM32 56h1v1h-1zM35 56h3v1h-3zM40 56h1v1h-1zM43 56h1v1h-1zM48 56h1v1h-1zM50 56h1v1h-1zM52 56h2v1h-2zM55 56h2v1h-2zM2 57h1v1h-1zM8 57h1v1h-1zM10 57h1v1h-1zM12 57h1v1h-1zM14 57h1v1h-1zM18 57h1v1h-1zM20 57h1v1h-1zM23 57h3v1h-3zM27 57h3v1h-3zM32 57h1v1h-1zM34 57h2v1h-2zM37 57h1v1h-1zM42 57h1v1h-1zM44 57h1v1h-1zM46 57h2v1h-2zM49 57h3v1h-3zM53 57h2v1h-2zM56 57h1v1h-1zM2 58h7v1h-7zM10 58h2v1h-2zM13 58h1v1h-1zM15 58h6v1h-6zM22 58h2v1h-2zM29 58h1v1h-1zM35 58h1v1h-1zM37 58h5v1h-5zM47 58h2v1h-2zM53 58h1v1h-1zM55 58h1v1h-1zM57 58h1v1h-1z" fill="#DCE6F2"></path>
+          </svg>
+        </div>
+        <pre><span class="prompt">$</span> python -m clipsync pair
+
+  <span class="val">Scan this with the ClipSync app</span>
+  room          <span class="val">3f2504e0-4f89-41d3-9a0c-0305e82c3301</span>
+  key checksum  <span class="key">BP9M-L6LL</span>  (must match the app)
+  expires in    10 minutes
+  key stored at ~/.config/clipsync/room.json (mode 600, never uploaded)</pre>
+      </div>
+    </div>
+  </div>
+
+  <section id="downloads">
+    <div class="section-head">
+      <span class="step-no">01</span>
+      <h2>Downloads</h2>
+    </div>
+    <p class="section-note">
+      One agent for your computer, one app for your phone. Both halves are needed —
+      the desktop agent generates the key, the phone scans it.
+    </p>
+
+    <div class="caveat" id="release-state" hidden>
+      <span class="mark">!</span>
+      <div>
+        <p id="release-state-title"><strong>No packaged build published yet.</strong></p>
+        <p id="release-state-body">
+          Binaries appear here automatically once a release is tagged. Until then,
+          run the agent from source — the commands are under Verify below.
+        </p>
+      </div>
+    </div>
+
+    <h3 class="step-no" style="margin:1.75rem 0 0.85rem">DESKTOP AGENT</h3>
+    <div class="grid">
+      <article class="dl" data-platform="macos">
+        <div class="dl-top">
+          <h3>macOS</h3>
+          <span class="tag" data-here>macOS 11+</span>
+        </div>
+        <p class="meta" data-meta>Apple silicon &amp; Intel</p>
+        <div class="links" data-links>
+          <span class="pending">Build from source</span>
+        </div>
+      </article>
+
+      <article class="dl" data-platform="windows">
+        <div class="dl-top">
+          <h3>Windows</h3>
+          <span class="tag" data-here>Windows 10/11</span>
+        </div>
+        <p class="meta" data-meta>Portable .exe, no installer</p>
+        <div class="links" data-links>
+          <span class="pending">Build from source</span>
+        </div>
+      </article>
+
+      <article class="dl" data-platform="linux">
+        <div class="dl-top">
+          <h3>Linux</h3>
+          <span class="tag" data-here>glibc 2.31+</span>
+        </div>
+        <p class="meta" data-meta>Needs xclip, xsel or wl-clipboard</p>
+        <div class="links" data-links>
+          <span class="pending">Build from source</span>
+        </div>
+      </article>
+    </div>
+
+    <h3 class="step-no" style="margin:1.75rem 0 0.85rem">PHONE APP</h3>
+    <div class="grid">
+      <article class="dl" data-platform="android">
+        <div class="dl-top">
+          <h3>Android</h3>
+          <span class="tag" data-here>Android 8+</span>
+        </div>
+        <p class="meta" data-meta>Direct .apk install</p>
+        <div class="links" data-links>
+          <span class="pending">Build with EAS</span>
+        </div>
+      </article>
+
+      <article class="dl" data-platform="ios">
+        <div class="dl-top">
+          <h3>iOS</h3>
+          <span class="tag" data-here>iOS 15.1+</span>
+        </div>
+        <p class="meta" data-meta>TestFlight build</p>
+        <div class="links" data-links>
+          <span class="pending">Build with EAS</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="server">
+    <div class="section-head">
+      <span class="step-no">02</span>
+      <h2>What the server actually stores</h2>
+    </div>
+    <p class="section-note">
+      These are real rows, produced by the shipped encryption code and checked by both
+      test suites. The right column is the entire contents of
+      <code>clipboard_events.payload</code>.
+    </p>
+
+    <div class="ledger">
+      <div class="ledger-row">
+        <div class="ledger-cell plain">
+          <span class="who">You copied</span>
+          <p>hello from the desktop</p>
+        </div>
+        <div class="ledger-cell cipher">
+          <span class="who">Server sees</span>
+          <p>bs997P3OwQpefnWDVqWj0OBqsdGDDKWt6mkDTM1XBSgGEMJC4qr/xMQyANTNxOQubHE=</p>
+        </div>
+      </div>
+      <div class="ledger-row">
+        <div class="ledger-cell plain">
+          <span class="who">You copied</span>
+          <p>café — naïve 🚀 клавиатура</p>
+        </div>
+        <div class="ledger-cell cipher">
+          <span class="who">Server sees</span>
+          <p>dgPU4/VFQPoFoj3reTsa0xiHMQve7JkL6wusT/WbZISjfE8jK1Qr+pR7orEKZrW3lE1XzFzw5Q0Qb2KoTJ68yj8w4ronAA==</p>
+        </div>
+      </div>
+      <div class="ledger-row">
+        <div class="ledger-cell plain">
+          <span class="who">You copied</span>
+          <p>(nothing — an empty string)</p>
+        </div>
+        <div class="ledger-cell cipher">
+          <span class="who">Server sees</span>
+          <p>XGCxvcuqMxPhR8MtuAT70NIXLQp9lLQ99yd9YQ==</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-note" style="margin:1.5rem 0 0">
+      Each payload is <code>base64(nonce ‖ ciphertext ‖ tag)</code>. The room id is the
+      authenticated associated data, so a payload lifted into another room fails its tag
+      check before any plaintext exists.
+    </p>
+  </section>
+
+  <section id="how">
+    <div class="section-head">
+      <span class="step-no">03</span>
+      <h2>How pairing works</h2>
+    </div>
+    <p class="section-note">
+      Four steps, in this order — each one depends on the last.
+    </p>
+
+    <ol class="steps">
+      <li>
+        <span class="n">01</span>
+        <div>
+          <h3>The desktop makes the key</h3>
+          <p>32 bytes from the OS random source, plus a single-use join code. Only the
+            SHA-256 digest of that code is ever sent to the server.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">02</span>
+        <div>
+          <h3>The QR carries it across</h3>
+          <p>The key travels from your screen to your camera and nowhere else. It is not
+            uploaded, escrowed, or derived from a password.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">03</span>
+        <div>
+          <h3>Both screens show the same checksum</h3>
+          <p>A short fingerprint derived through SHA-256. If the two don't match, stop —
+            something else produced that code.</p>
+        </div>
+      </li>
+      <li>
+        <span class="n">04</span>
+        <div>
+          <h3>Copy, then tap to paste</h3>
+          <p>Text copied on your computer arrives as ciphertext. Your phone shows
+            <em>"New copied text received. Tap to copy."</em> — the tap decrypts it and
+            writes to the clipboard, which is the only moment Android and iOS allow it.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="verify">
+    <div class="section-head">
+      <span class="step-no">04</span>
+      <h2>Run it from source</h2>
+    </div>
+    <p class="section-note">
+      The agent is a few hundred lines of Python. Reading it takes less time than
+      trusting a binary.
+    </p>
+
+    <pre class="snippet"><span class="prompt">$</span> git clone https://github.com/Ayomide716/Testing_Fable.git
+<span class="prompt">$</span> cd Testing_Fable/desktop
+<span class="prompt">$</span> pip install -r requirements.txt
+
+<span class="prompt">$</span> export SUPABASE_URL="https://&lt;project&gt;.supabase.co"
+<span class="prompt">$</span> export SUPABASE_ANON_KEY="&lt;anon key&gt;"
+
+<span class="prompt">$</span> python -m clipsync pair    <span style="color:var(--dim)"># shows the QR</span>
+<span class="prompt">$</span> python -m clipsync run     <span style="color:var(--dim)"># starts syncing</span></pre>
+
+    <p class="section-note" style="margin:1.5rem 0 0">
+      Downloaded a packaged build instead? Every release ships a
+      <code>SHA256SUMS.txt</code>; check it with <code>shasum -a 256 -c SHA256SUMS.txt</code>
+      on macOS or Linux, or <code>Get-FileHash</code> on Windows.
+    </p>
+
+    <div class="caveat" style="margin-top:1.5rem">
+      <span class="mark">!</span>
+      <div>
+        <p><strong>The packaged builds are not code-signed.</strong></p>
+        <p>macOS Gatekeeper and Windows SmartScreen will both warn on first launch.
+          On macOS, right-click the binary and choose Open, or run
+          <code>xattr -d com.apple.quarantine clipsync</code>. Signing needs a paid
+          Apple Developer ID and a Windows certificate — until those exist, verify the
+          checksum instead, or run from source.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>ClipSync · your clipboard, encrypted end to end</span>
+    <span>
+      <a href="https://github.com/Ayomide716/Testing_Fable">Source</a> ·
+      <a href="https://github.com/Ayomide716/Testing_Fable/releases">Releases</a> ·
+      <a href="https://github.com/Ayomide716/Testing_Fable#readme">Docs</a>
+    </span>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    'use strict';
+
+    var REPO = 'Ayomide716/Testing_Fable';
+
+    // Asset naming produced by .github/workflows/release.yml. Each platform
+    // lists the labels it offers and how to spot the matching asset.
+    var PLATFORMS = {
+      macos: {
+        label: 'macOS',
+        cta: 'Download for macOS',
+        note: 'Desktop agent · Apple silicon & Intel',
+        builds: [
+          { label: 'Apple silicon', match: /macos.*arm64/i },
+          { label: 'Intel', match: /macos.*x86_64/i }
+        ]
+      },
+      windows: {
+        label: 'Windows',
+        cta: 'Download for Windows',
+        note: 'Desktop agent · portable .exe',
+        builds: [{ label: 'Windows x64', match: /windows.*x86_64/i }]
+      },
+      linux: {
+        label: 'Linux',
+        cta: 'Download for Linux',
+        note: 'Desktop agent · needs xclip or wl-clipboard',
+        builds: [{ label: 'Linux x64', match: /linux.*x86_64/i }]
+      },
+      android: {
+        label: 'Android',
+        cta: 'Download the APK',
+        note: 'Phone app · Android 8.0 or later',
+        builds: [{ label: 'APK', match: /\.apk$/i }]
+      },
+      ios: {
+        label: 'iOS',
+        cta: 'Open TestFlight',
+        note: 'Phone app · iOS 15.1 or later',
+        builds: [{ label: 'TestFlight', match: /testflight/i }]
+      }
+    };
+
+    function detectPlatform() {
+      var ua = navigator.userAgent;
+      var platform = navigator.platform || '';
+      if (/Android/i.test(ua)) return 'android';
+      // iPadOS reports as a Mac, so check for a touch screen too.
+      if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+      if (/Mac/i.test(platform) && navigator.maxTouchPoints > 1) return 'ios';
+      if (/Mac/i.test(platform)) return 'macos';
+      if (/Win/i.test(platform)) return 'windows';
+      if (/Linux/i.test(platform)) return 'linux';
+      return null;
+    }
+
+    function formatSize(bytes) {
+      if (!bytes) return '';
+      var mb = bytes / (1024 * 1024);
+      return (mb >= 10 ? Math.round(mb) : mb.toFixed(1)) + ' MB';
+    }
+
+    var current = detectPlatform();
+    var cards = {};
+
+    Array.prototype.forEach.call(document.querySelectorAll('.dl'), function (card) {
+      var name = card.getAttribute('data-platform');
+      cards[name] = card;
+      if (name === current) {
+        card.setAttribute('data-current', 'true');
+        var tag = card.querySelector('[data-here]');
+        if (tag) {
+          tag.textContent = 'Your device';
+          tag.classList.add('here');
+        }
+      }
+    });
+
+    // Point the hero button at the right section for this device even before
+    // the release data lands, so the page is useful with JS-blocked fetches.
+    var primary = document.getElementById('primary-download');
+    var primaryLabel = document.getElementById('primary-label');
+    var primaryNote = document.getElementById('primary-note');
+    if (current) {
+      primaryLabel.textContent = PLATFORMS[current].cta;
+      primaryNote.textContent = PLATFORMS[current].note;
+    }
+
+    function showFallback(title, body) {
+      var panel = document.getElementById('release-state');
+      document.getElementById('release-state-title').innerHTML = '<strong>' + title + '</strong>';
+      document.getElementById('release-state-body').textContent = body;
+      panel.hidden = false;
+    }
+
+    fetch('https://api.github.com/repos/' + REPO + '/releases/latest', {
+      headers: { Accept: 'application/vnd.github+json' }
+    })
+      .then(function (response) {
+        if (response.status === 404) throw new Error('no-release');
+        if (!response.ok) throw new Error('http-' + response.status);
+        return response.json();
+      })
+      .then(function (release) {
+        var assets = release.assets || [];
+        if (!assets.length) throw new Error('no-assets');
+
+        var version = release.tag_name || '';
+        var matchedAny = false;
+
+        Object.keys(PLATFORMS).forEach(function (name) {
+          var card = cards[name];
+          if (!card) return;
+
+          var found = PLATFORMS[name].builds
+            .map(function (build) {
+              var asset = assets.filter(function (a) { return build.match.test(a.name); })[0];
+              return asset ? { label: build.label, asset: asset } : null;
+            })
+            .filter(Boolean);
+
+          if (!found.length) return;
+          matchedAny = true;
+
+          var links = card.querySelector('[data-links]');
+          links.textContent = '';
+          found.forEach(function (entry) {
+            var a = document.createElement('a');
+            a.href = entry.asset.browser_download_url;
+            a.textContent = entry.label + ' ↓';
+            a.setAttribute('download', '');
+            links.appendChild(a);
+          });
+
+          var meta = card.querySelector('[data-meta]');
+          meta.textContent = version + ' · ' + formatSize(found[0].asset.size);
+
+          if (name === current) {
+            primary.href = found[0].asset.browser_download_url;
+            primary.setAttribute('download', '');
+            primaryNote.textContent =
+              PLATFORMS[name].note + ' · ' + version + ' · ' + formatSize(found[0].asset.size);
+          }
+        });
+
+        if (!matchedAny) {
+          showFallback(
+            'Release ' + version + ' has no matching builds yet.',
+            'The tagged release exists but its platform binaries are still building. ' +
+              'Run the agent from source in the meantime.'
+          );
+        }
+      })
+      .catch(function (error) {
+        if (error.message === 'no-release' || error.message === 'no-assets') {
+          showFallback(
+            'No packaged build published yet.',
+            'Binaries appear here automatically once a release is tagged. Until then, ' +
+              'run the agent from source — the commands are under "Run it from source".'
+          );
+        } else {
+          showFallback(
+            "Couldn't reach GitHub for the latest release.",
+            'The download links live on the releases page. You can also run the agent ' +
+              'from source with the commands below.'
+          );
+        }
+      });
+  })();
+</script>

@@ -1,0 +1,132 @@
+name: Release
+
+# Tag a version to publish downloadable builds:
+#   git tag v1.0.0 && git push origin v1.0.0
+#
+# The desktop agent is frozen with PyInstaller on each OS (there is no
+# cross-compilation for native binaries), the archives are checksummed, and
+# everything is attached to the GitHub Release. web/index.html reads that
+# release at page load, so the download page fills itself in.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build and attach assets to'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            label: linux-x86_64
+            archive: tar.gz
+          - os: macos-14
+            label: macos-arm64
+            archive: tar.gz
+          - os: macos-13
+            label: macos-x86_64
+            archive: tar.gz
+          - os: windows-2022
+            label: windows-x86_64
+            archive: zip
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        working-directory: desktop
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller==6.11.1
+
+      - name: Run tests
+        run: |
+          python desktop/tests/test_crypto.py
+          python desktop/tests/test_listener.py
+
+      - name: Freeze the agent
+        working-directory: desktop
+        run: >
+          pyinstaller run_clipsync.py
+          --name clipsync
+          --onefile
+          --console
+          --collect-submodules clipsync
+          --hidden-import pyperclip
+          --noconfirm
+          --clean
+
+      - name: Package (unix)
+        if: matrix.archive == 'tar.gz'
+        working-directory: desktop/dist
+        run: |
+          chmod +x clipsync
+          cp ../../README.md .
+          tar -czf "clipsync-${{ matrix.label }}.tar.gz" clipsync README.md
+
+      - name: Package (windows)
+        if: matrix.archive == 'zip'
+        working-directory: desktop/dist
+        shell: pwsh
+        run: |
+          Copy-Item ..\..\README.md .
+          Compress-Archive -Path clipsync.exe,README.md -DestinationPath "clipsync-${{ matrix.label }}.zip"
+
+      - name: Smoke-test the binary
+        working-directory: desktop/dist
+        shell: bash
+        run: |
+          # `status` with no pairing must fail cleanly rather than crash —
+          # proof the freeze actually produced a working CLI.
+          if [ "${{ matrix.archive }}" = "zip" ]; then BIN=./clipsync.exe; else BIN=./clipsync; fi
+          "$BIN" --help
+          if "$BIN" status; then
+            echo "status succeeded on an unpaired machine, which it must not"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clipsync-${{ matrix.label }}
+          path: desktop/dist/clipsync-${{ matrix.label }}.*
+          if-no-files-found: error
+
+  publish:
+    name: Publish release
+    needs: desktop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Checksum every asset
+        working-directory: artifacts
+        run: |
+          shasum -a 256 clipsync-* > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          files: artifacts/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true

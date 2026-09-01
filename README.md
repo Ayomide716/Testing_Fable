@@ -116,6 +116,59 @@ true always-on path needs Expo push notifications carrying the ciphertext,
 dispatched by a Supabase Edge Function on insert — that keeps the
 zero-knowledge property, since the function would forward opaque bytes.
 
+## Distribution
+
+`web/index.html` is the download page — one self-contained file, no build step.
+It reads the repository's latest GitHub Release at page load, so the download
+links fill themselves in the moment a release exists and degrade to
+run-from-source instructions when it doesn't.
+
+Deploy it under **Settings → Pages → Source: GitHub Actions**; the
+`Deploy download page` workflow publishes `web/` on every push to `main`.
+
+### Cutting a release
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
+
+`.github/workflows/release.yml` then freezes the desktop agent with PyInstaller
+on each OS runner (native binaries cannot be cross-compiled), smoke-tests each
+one, checksums them into `SHA256SUMS.txt`, and attaches everything to the
+release as:
+
+| Asset | Built on |
+| --- | --- |
+| `clipsync-macos-arm64.tar.gz` | macos-14 |
+| `clipsync-macos-x86_64.tar.gz` | macos-13 |
+| `clipsync-windows-x86_64.zip` | windows-2022 |
+| `clipsync-linux-x86_64.tar.gz` | ubuntu-22.04 |
+
+The download page matches assets by those names, so keep them stable.
+
+### Phone builds
+
+The app is not built by CI, because both stores need credentials this repo
+cannot hold. With an Expo account:
+
+```bash
+cd mobile
+npx eas build -p android --profile preview   # produces an installable .apk
+npx eas build -p ios --profile preview       # needs an Apple Developer account
+```
+
+Upload the resulting `.apk` to the same GitHub Release — the page picks up any
+asset ending in `.apk` automatically. iOS has no sideload path: it needs
+TestFlight, which needs the paid Apple Developer Program.
+
+### What is not signed
+
+The packaged desktop builds carry no code signature, so macOS Gatekeeper and
+Windows SmartScreen will both warn on first launch. Signing needs a paid Apple
+Developer ID and a Windows certificate. Until those exist, the honest paths are
+verifying `SHA256SUMS.txt` or running from source — the download page says so
+plainly rather than telling people to click through the warning.
+
 ## Tests
 
 ```bash

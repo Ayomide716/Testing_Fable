@@ -1,0 +1,43 @@
+name: Deploy download page
+
+# Publishes web/ to GitHub Pages. Enable it once under
+# Settings → Pages → Source: GitHub Actions.
+
+on:
+  push:
+    branches: [main]
+    paths: ['web/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the page is self-contained
+        run: |
+          # The page must not grow a build step or a local asset dependency:
+          # Pages serves web/ verbatim.
+          test -f web/index.html
+          ! grep -qE '<(script|link)[^>]+(src|href)="[^"#]*\.(js|css)"' web/index.html \
+            || (echo "web/index.html gained an external local asset" && exit 1)
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: deploy
+        uses: actions/deploy-pages@v4
