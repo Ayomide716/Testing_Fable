@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "ClipSync",
+    "slug": "clipsync",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "clipsync",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#05060B",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#05060B",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.clipsync.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "ClipSync uses the camera once, to read the pairing code shown on your computer.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["remote-notification"]
+      }
+    },
+    "android": {
+      "package": "com.clipsync.app",
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "backgroundColor": "#05060B"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "ClipSync uses the camera once, to read the pairing code shown on your computer."
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "ClipSync protects your clipboard key with device authentication."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#22D3EE",
+          "defaultChannel": "clipboard-sync"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

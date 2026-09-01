@@ -1,0 +1,28 @@
+{
+  "_comment": "Cross-language AES-256-GCM test vectors. Both desktop/tests/test_crypto.py and mobile/src/lib/__tests__/crypto.test.ts decrypt these, which is what proves the Python agent and the React Native app speak the same wire format. Payloads were produced by desktop/clipsync/crypto.py.",
+  "key_b64": "8vXQ0kZ1n7mS3jK9pR4tWc2yLbA6eH0uNfD5gXiQzTo=",
+  "room_id": "3f2504e0-4f89-41d3-9a0c-0305e82c3301",
+  "fingerprint": "BP9M-L6LL",
+  "cases": [
+    {
+      "name": "ascii",
+      "plaintext": "hello from the desktop",
+      "payload": "bs997P3OwQpefnWDVqWj0OBqsdGDDKWt6mkDTM1XBSgGEMJC4qr/xMQyANTNxOQubHE="
+    },
+    {
+      "name": "unicode",
+      "plaintext": "café — naïve 🚀 клавиатура",
+      "payload": "dgPU4/VFQPoFoj3reTsa0xiHMQve7JkL6wusT/WbZISjfE8jK1Qr+pR7orEKZrW3lE1XzFzw5Q0Qb2KoTJ68yj8w4ronAA=="
+    },
+    {
+      "name": "empty",
+      "plaintext": "",
+      "payload": "XGCxvcuqMxPhR8MtuAT70NIXLQp9lLQ99yd9YQ=="
+    },
+    {
+      "name": "multiline",
+      "plaintext": "line one\nline two\ttabbed",
+      "payload": "bHWMb+FMpdQOfYsiu+LpWK0Vn2GBR9a6XOeHCwhVeOtYa2sDpan4gyPqpAx3iZ3t9M3C2w=="
+    }
+  ]
+}
