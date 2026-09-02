@@ -762,7 +762,8 @@
     <p class="section-note" style="margin:1.5rem 0 0">
       On an Intel Mac, this is the only route — the packaged macOS build is
       Apple silicon only. Downloaded a packaged build instead? Every release ships a
-      <code>SHA256SUMS.txt</code>; check it with <code>shasum -a 256 -c SHA256SUMS.txt</code>
+      <a id="checksums-link" href="https://github.com/Ayomide716/Testing_Fable/releases/latest">SHA256SUMS.txt</a>;
+      check it with <code>shasum -a 256 -c SHA256SUMS.txt</code>
       on macOS or Linux, or <code>Get-FileHash</code> on Windows.
     </p>
 
@@ -899,6 +900,14 @@
 
         var version = release.tag_name || '';
         var matchedAny = false;
+
+        // Point the Verify section straight at this release's checksum file
+        // rather than making people hunt for it on the releases page.
+        var sums = assets.filter(function (a) { return /^SHA256SUMS/i.test(a.name); })[0];
+        if (sums) {
+          var sumsLink = document.getElementById('checksums-link');
+          if (sumsLink) sumsLink.href = sums.browser_download_url;
+        }
 
         Object.keys(PLATFORMS).forEach(function (name) {
           var card = cards[name];
