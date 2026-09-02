@@ -126,6 +126,16 @@ run-from-source instructions when it doesn't.
 Deploy it under **Settings → Pages → Source: GitHub Actions**; the
 `Deploy download page` workflow publishes `web/` on every push to `main`.
 
+Two setup details that are easy to lose an afternoon to:
+
+* **Pages is free on public repositories only.** On a private repo it needs a
+  paid plan — and release assets there are not publicly downloadable either,
+  so a download page backed by a private repo's releases cannot work at all.
+* **`main` must be the repository's default branch.** Enabling Pages creates a
+  `github-pages` environment whose deployment rule permits only the default
+  branch. A run on any other branch is rejected in about a second, with no
+  steps and no logs, which looks nothing like a permissions error.
+
 ### Cutting a release
 
 ```bash
