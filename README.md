@@ -140,11 +140,15 @@ release as:
 | Asset | Built on |
 | --- | --- |
 | `clipsync-macos-arm64.tar.gz` | macos-14 |
-| `clipsync-macos-x86_64.tar.gz` | macos-13 |
 | `clipsync-windows-x86_64.zip` | windows-2022 |
 | `clipsync-linux-x86_64.tar.gz` | ubuntu-22.04 |
 
 The download page matches assets by those names, so keep them stable.
+
+There is no Intel macOS binary: the `macos-13` image no longer picks up
+runners, and one permanently queued matrix job blocks the publish step. Intel
+Macs run from source. The page already looks for a `macos-x86_64` asset, so
+adding that matrix entry back is all it takes if an Intel image returns.
 
 ### Phone builds
 

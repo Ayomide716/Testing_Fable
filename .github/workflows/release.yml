@@ -31,11 +31,12 @@ jobs:
           - os: ubuntu-22.04
             label: linux-x86_64
             archive: tar.gz
+          # No Intel macOS entry: the macos-13 image no longer picks up
+          # runners (a job for it queued indefinitely while every other
+          # platform built in under a minute), and one permanently queued
+          # job blocks the publish step. Intel Macs run from source.
           - os: macos-14
             label: macos-arm64
-            archive: tar.gz
-          - os: macos-13
-            label: macos-x86_64
             archive: tar.gz
           - os: windows-2022
             label: windows-x86_64

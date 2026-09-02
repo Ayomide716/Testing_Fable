@@ -582,7 +582,7 @@
           <h3>macOS</h3>
           <span class="tag" data-here>macOS 11+</span>
         </div>
-        <p class="meta" data-meta>Apple silicon &amp; Intel</p>
+        <p class="meta" data-meta>Apple silicon (M1 and later)</p>
         <div class="links" data-links>
           <span class="pending">Build from source</span>
         </div>
@@ -760,7 +760,8 @@
 <span class="prompt">$</span> python -m clipsync run     <span style="color:var(--dim)"># starts syncing</span></pre>
 
     <p class="section-note" style="margin:1.5rem 0 0">
-      Downloaded a packaged build instead? Every release ships a
+      On an Intel Mac, this is the only route — the packaged macOS build is
+      Apple silicon only. Downloaded a packaged build instead? Every release ships a
       <code>SHA256SUMS.txt</code>; check it with <code>shasum -a 256 -c SHA256SUMS.txt</code>
       on macOS or Linux, or <code>Get-FileHash</code> on Windows.
     </p>
@@ -800,7 +801,7 @@
       macos: {
         label: 'macOS',
         cta: 'Download for macOS',
-        note: 'Desktop agent · Apple silicon & Intel',
+        note: 'Desktop agent · Apple silicon (M1 and later)',
         builds: [
           { label: 'Apple silicon', match: /macos.*arm64/i },
           { label: 'Intel', match: /macos.*x86_64/i }
