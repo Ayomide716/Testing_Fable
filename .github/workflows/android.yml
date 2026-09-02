@@ -64,17 +64,36 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      # --non-interactive plus --wait: the job blocks until Expo finishes,
-      # so the APK exists by the time the next step runs.
+      # --wait blocks until Expo finishes. --output is rejected for cloud
+      # builds ("--output is allowed only for local builds"), so the APK is
+      # fetched from the artifact URL the build reports instead.
       - name: Build the APK on EAS
         working-directory: mobile
         run: |
+          set -o pipefail
           eas build \
             --platform android \
             --profile preview \
             --non-interactive \
             --wait \
-            --output ../clipsync-android.apk
+            --json | tee build.json
+
+          url=$(node -e "
+            const data = JSON.parse(require('fs').readFileSync('build.json', 'utf8'));
+            const build = Array.isArray(data) ? data[0] : data;
+            const art = build.artifacts || {};
+            const url = art.applicationArchiveUrl || art.buildUrl;
+            if (!url) {
+              console.error('build finished but reported no artifact url');
+              console.error(JSON.stringify(build, null, 2));
+              process.exit(1);
+            }
+            process.stdout.write(url);
+          ")
+
+          echo "Downloading $url"
+          curl -fL --retry 3 "$url" -o ../clipsync-android.apk
+          ls -lh ../clipsync-android.apk
 
       - name: Attach it to the release
         uses: softprops/action-gh-release@v2
