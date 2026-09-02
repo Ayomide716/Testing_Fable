@@ -20,6 +20,8 @@ import { gcm } from '@noble/ciphers/aes';
 import { sha256 } from '@noble/hashes/sha256';
 import { getRandomBytes } from 'expo-crypto';
 
+import { decodeUtf8, encodeUtf8 } from './utf8';
+
 export const KEY_BYTES = 32;
 export const NONCE_BYTES = 12;
 export const TAG_BYTES = 16;
@@ -31,9 +33,6 @@ export class CryptoError extends Error {
     this.name = 'CryptoError';
   }
 }
-
-const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
 
 /** Generate a fresh AES-256 key from the platform CSPRNG. */
 export function generateKey(): Uint8Array {
@@ -54,7 +53,7 @@ export function decodeKey(encoded: string): Uint8Array {
 /** Seal `plaintext` for `roomId`, returning the base64 wire payload. */
 export function encrypt(key: Uint8Array, plaintext: string, roomId: string): string {
   assertKey(key);
-  const data = textEncoder.encode(plaintext);
+  const data = encodeUtf8(plaintext);
   if (data.length > MAX_PLAINTEXT_BYTES) {
     throw new CryptoError(
       `payload of ${data.length} bytes exceeds the ${MAX_PLAINTEXT_BYTES} byte limit`,
@@ -95,7 +94,7 @@ export function decrypt(key: Uint8Array, payload: string, roomId: string): strin
       'authentication failed: wrong room key, wrong room, or tampered payload',
     );
   }
-  return textDecoder.decode(plaintext);
+  return decodeUtf8(plaintext);
 }
 
 /**
@@ -105,7 +104,7 @@ export function decrypt(key: Uint8Array, payload: string, roomId: string): strin
  */
 export function fingerprint(key: Uint8Array): string {
   assertKey(key);
-  const label = textEncoder.encode('clipsync-key-fingerprint-v1');
+  const label = encodeUtf8('clipsync-key-fingerprint-v1');
   const input = new Uint8Array(label.length + key.length);
   input.set(label, 0);
   input.set(key, label.length);
@@ -173,7 +172,7 @@ function aad(roomId: string): Uint8Array {
   if (!roomId) {
     throw new CryptoError('roomId is required as additional authenticated data');
   }
-  return textEncoder.encode(roomId);
+  return encodeUtf8(roomId);
 }
 
 function assertKey(key: Uint8Array): void {

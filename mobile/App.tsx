@@ -1,3 +1,6 @@
+// Must come first: installs TextEncoder/TextDecoder, which Hermes lacks.
+import './src/polyfills';
+
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
