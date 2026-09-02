@@ -10,6 +10,7 @@
     "backgroundColor": "#05060B",
     "newArchEnabled": true,
     "splash": {
+      "image": "./assets/splash-icon.png",
       "backgroundColor": "#05060B",
       "resizeMode": "contain"
     },
@@ -28,6 +29,7 @@
       "package": "com.clipsync.app",
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#05060B"
       },
       "permissions": [
@@ -53,7 +55,8 @@
         "expo-notifications",
         {
           "color": "#22D3EE",
-          "defaultChannel": "clipboard-sync"
+          "defaultChannel": "clipboard-sync",
+          "icon": "./assets/notification-icon.png"
         }
       ]
     ],
@@ -64,6 +67,10 @@
       "eas": {
         "projectId": "919aaa24-94af-4d3b-b53e-c669891de10f"
       }
+    },
+    "icon": "./assets/icon.png",
+    "web": {
+      "favicon": "./assets/favicon.png"
     }
   }
 }

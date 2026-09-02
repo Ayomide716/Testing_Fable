@@ -27,14 +27,14 @@
     "expo-notifications": "~0.31.2",
     "expo-secure-store": "~14.2.3",
     "expo-status-bar": "~2.2.3",
-    "nativewind": "^4.1.23",
+    "nativewind": "4.1.23",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
-    "react-native-url-polyfill": "^2.0.0",
-    "react-native-worklets": "0.3.0"
+    "react-native-url-polyfill": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

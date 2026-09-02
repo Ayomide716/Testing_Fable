@@ -54,6 +54,14 @@ jobs:
         working-directory: mobile
         run: npm install --no-audit --no-fund
 
+      # Catches SDK/native version drift in seconds, instead of after a
+      # fourteen-minute build or — worse — in a crash on the user's phone.
+      # This is what would have caught react-native-reanimated resolving to
+      # v4 on an SDK 53 (RN 0.79) project.
+      - name: Check dependency versions against the Expo SDK
+        working-directory: mobile
+        run: npx expo install --check
+
       - name: Typecheck
         working-directory: mobile
         run: npx tsc --noEmit
