@@ -33,7 +33,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # 22, not 20: current eas-cli pulls @oclif/plugin-autocomplete,
+          # which declares engines.node >= 22 and fails the install outright.
+          node-version: '22'
 
       - name: Check the Expo token is present
         env:
