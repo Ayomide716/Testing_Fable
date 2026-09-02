@@ -44,13 +44,19 @@ def main(argv: Optional[list[str]] = None) -> int:
     p_run.add_argument("--no-apply", action="store_true",
                        help="publish local copies but do not overwrite this clipboard")
 
+    sub.add_parser("gui", help="open the ClipSync window")
     sub.add_parser("status", help="show the paired room and its devices")
     sub.add_parser("unpair", help="delete the local room key and session")
 
     p_send = sub.add_parser("send", help="encrypt and publish one value, then exit")
     p_send.add_argument("text", nargs="?", help="text to send (default: read stdin)")
 
-    args = parser.parse_args(argv)
+    raw = list(sys.argv[1:] if argv is None else argv)
+    if not raw and getattr(sys, "frozen", False):
+        # Double-clicked rather than run from a shell: show the window.
+        raw = ["gui"]
+
+    args = parser.parse_args(raw)
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format=f"{DIM}%(asctime)s{RESET} %(levelname)-7s %(message)s",
@@ -64,6 +70,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             "status": cmd_status,
             "unpair": cmd_unpair,
             "send": cmd_send,
+            "gui": cmd_gui,
         }[args.command]
         return handler(args)
     except KeyboardInterrupt:
@@ -134,6 +141,12 @@ def cmd_run(args) -> int:
         print(f"\nsent {listener.stats.sent}, received {listener.stats.received}, "
               f"errors {listener.stats.errors}")
     return 0
+
+
+def cmd_gui(args) -> int:
+    from .gui import main as gui_main
+
+    return gui_main()
 
 
 def cmd_status(args) -> int:

@@ -26,6 +26,7 @@ generated on the desktop and handed to the phone through a QR code.
 | `supabase/schema.sql` | Tables, RLS policies, pairing RPCs, retention job |
 | `desktop/clipsync/crypto.py` | AES-256-GCM seal/open, key generation, fingerprint |
 | `desktop/clipsync/pairing.py` | Key + room creation, QR rendering (terminal + PNG) |
+| `desktop/clipsync/gui.py` | The windowed app (Tkinter): setup, pairing, dashboard |
 | `desktop/clipsync/listener.py` | The bidirectional clipboard sync loop |
 | `desktop/clipsync/api.py` | Small Supabase REST client (auth + PostgREST) |
 | `mobile/src/lib/crypto.ts` | The byte-for-byte TypeScript twin of `crypto.py` |
@@ -55,9 +56,14 @@ pip install -r requirements.txt
 export SUPABASE_URL="https://<project>.supabase.co"
 export SUPABASE_ANON_KEY="<anon key>"
 
-python -m clipsync pair     # prints the QR and a key checksum
+python -m clipsync gui      # the window: setup, pairing QR, synced history
+python -m clipsync pair     # or headless: prints the QR and a key checksum
 python -m clipsync run      # starts syncing
 ```
+
+Each packaged download contains both: `ClipSync` (the window) and `clipsync`
+(the command-line agent). The window is the one to open if you just want it
+working; the CLI is there for running it in the background or over SSH.
 
 On Linux `pyperclip` needs a backend: `xclip` or `xsel` on X11, `wl-clipboard`
 on Wayland.

@@ -582,7 +582,7 @@
           <h3>macOS</h3>
           <span class="tag" data-here>macOS 11+</span>
         </div>
-        <p class="meta" data-meta>Apple silicon (M1 and later)</p>
+        <p class="meta" data-meta>Window + CLI · Apple silicon</p>
         <div class="links" data-links>
           <span class="pending">Build from source</span>
         </div>
@@ -593,7 +593,7 @@
           <h3>Windows</h3>
           <span class="tag" data-here>Windows 10/11</span>
         </div>
-        <p class="meta" data-meta>Portable .exe, no installer</p>
+        <p class="meta" data-meta>Window + CLI, no installer</p>
         <div class="links" data-links>
           <span class="pending">Build from source</span>
         </div>
@@ -604,7 +604,7 @@
           <h3>Linux</h3>
           <span class="tag" data-here>glibc 2.31+</span>
         </div>
-        <p class="meta" data-meta>Needs xclip, xsel or wl-clipboard</p>
+        <p class="meta" data-meta>Window + CLI · needs xclip or wl-clipboard</p>
         <div class="links" data-links>
           <span class="pending">Build from source</span>
         </div>
@@ -612,8 +612,10 @@
     </div>
 
     <p class="meta" style="margin:0.9rem 0 0; color:var(--muted); font-family:var(--body); font-size:0.9rem">
-      Unpack it anywhere, then run <code>./clipsync pair</code> — or
-      <code>clipsync.exe pair</code> on Windows — to get the QR.
+      Each download holds two programs: <code>ClipSync</code>, the window with
+      the pairing QR and your synced history, and <code>clipsync</code>, the
+      command-line agent for running it in the background. Unpack and open
+      either one.
     </p>
 
     <h3 class="step-no" style="margin:1.75rem 0 0.85rem">PHONE APP</h3>

@@ -62,7 +62,11 @@ jobs:
           python desktop/tests/test_crypto.py
           python desktop/tests/test_listener.py
 
-      - name: Freeze the agent
+      # Two binaries from one codebase: `clipsync` is the console CLI,
+      # `ClipSync` is the windowed app. On Windows a --console build always
+      # shows a terminal behind the window, so the GUI needs its own
+      # --windowed build rather than one binary doing both.
+      - name: Freeze the CLI
         working-directory: desktop
         run: >
           pyinstaller run_clipsync.py
@@ -74,13 +78,34 @@ jobs:
           --noconfirm
           --clean
 
+      - name: Freeze the windowed app
+        working-directory: desktop
+        shell: bash
+        run: |
+          icon=()
+          if [ "${{ matrix.archive }}" = "zip" ]; then icon=(--icon assets/icon.ico); fi
+          pyinstaller run_clipsync_gui.py \
+            --name ClipSync \
+            --onefile \
+            --windowed \
+            --collect-submodules clipsync \
+            --hidden-import pyperclip \
+            --noconfirm \
+            "${icon[@]}"
+
       - name: Package (unix)
         if: matrix.archive == 'tar.gz'
         working-directory: desktop/dist
         run: |
           chmod +x clipsync
           cp ../../README.md .
-          tar -czf "clipsync-${{ matrix.label }}.tar.gz" clipsync README.md
+          # macOS --windowed produces a .app bundle; Linux a plain binary.
+          if [ -d ClipSync.app ]; then
+            tar -czf "clipsync-${{ matrix.label }}.tar.gz" clipsync ClipSync.app README.md
+          else
+            chmod +x ClipSync
+            tar -czf "clipsync-${{ matrix.label }}.tar.gz" clipsync ClipSync README.md
+          fi
 
       - name: Package (windows)
         if: matrix.archive == 'zip'
@@ -88,7 +113,7 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item ..\..\README.md .
-          Compress-Archive -Path clipsync.exe,README.md -DestinationPath "clipsync-${{ matrix.label }}.zip"
+          Compress-Archive -Path clipsync.exe,ClipSync.exe,README.md -DestinationPath "clipsync-${{ matrix.label }}.zip"
 
       - name: Smoke-test the binary
         working-directory: desktop/dist
