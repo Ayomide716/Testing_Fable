@@ -2,6 +2,7 @@
   "expo": {
     "name": "ClipSync",
     "slug": "clipsync",
+    "owner": "ayfrosh2008",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "clipsync",
@@ -18,7 +19,9 @@
       "infoPlist": {
         "NSCameraUsageDescription": "ClipSync uses the camera once, to read the pairing code shown on your computer.",
         "ITSAppUsesNonExemptEncryption": false,
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -56,6 +59,11 @@
     ],
     "experiments": {
       "typedRoutes": false
+    },
+    "extra": {
+      "eas": {
+        "projectId": "919aaa24-94af-4d3b-b53e-c669891de10f"
+      }
     }
   }
 }
