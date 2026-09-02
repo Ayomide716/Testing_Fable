@@ -183,6 +183,25 @@ Developer ID and a Windows certificate. Until those exist, the honest paths are
 verifying `SHA256SUMS.txt` or running from source — the download page says so
 plainly rather than telling people to click through the warning.
 
+## Running it without a laptop
+
+Two workflows exist so the remaining setup happens in CI rather than on a
+machine. Both read credentials from GitHub secrets, which are never printed in
+logs.
+
+**Supabase smoke test** — the only test that touches a live project. Add
+`SUPABASE_URL` and `SUPABASE_ANON_KEY` under Settings → Secrets and variables →
+Actions, then run *Actions → Supabase smoke test*. It signs in two anonymous
+identities, creates a room, publishes ciphertext, checks that a non-member is
+blocked by RLS from reading or writing it, pairs the second device with the
+join code (and confirms a wrong code is refused), decrypts across devices, and
+cleans up after itself. Use the anon key, never `service_role`.
+
+**Android APK** — add an `EXPO_TOKEN` secret from expo.dev (account settings →
+access tokens), then run *Actions → Build Android APK*. It typechecks, runs the
+crypto tests, builds on Expo's servers and attaches the APK to the release you
+name. The download page lists any `.apk` asset automatically.
+
 ## Tests
 
 ```bash

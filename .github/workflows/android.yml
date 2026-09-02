@@ -1,0 +1,82 @@
+name: Build Android APK
+
+# Builds an installable APK on Expo's servers and attaches it to a release,
+# so nobody has to run npm or eas locally.
+#
+# One-time setup:
+#   1. Create a free account at https://expo.dev
+#   2. Expo dashboard → account settings → Access tokens → Create token
+#   3. GitHub → Settings → Secrets and variables → Actions → New repository
+#      secret named EXPO_TOKEN, pasted from step 2
+#
+# Then: Actions → Build Android APK → Run workflow. The build takes roughly
+# 10-20 minutes on Expo's free queue. The APK is attached to the release you
+# name, and the download page picks up any .apk asset automatically.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release to attach the APK to, e.g. v0.1.0'
+        required: true
+        default: 'v0.1.0'
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: EAS build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check the Expo token is present
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::EXPO_TOKEN secret is not set. See the comment at the top of this workflow."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        working-directory: mobile
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        working-directory: mobile
+        run: npx tsc --noEmit
+
+      - name: Run the crypto tests
+        working-directory: mobile
+        run: npx jest --ci
+        continue-on-error: false
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # --non-interactive plus --wait: the job blocks until Expo finishes,
+      # so the APK exists by the time the next step runs.
+      - name: Build the APK on EAS
+        working-directory: mobile
+        run: |
+          eas build \
+            --platform android \
+            --profile preview \
+            --non-interactive \
+            --wait \
+            --output ../clipsync-android.apk
+
+      - name: Attach it to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          files: clipsync-android.apk
+          fail_on_unmatched_files: true

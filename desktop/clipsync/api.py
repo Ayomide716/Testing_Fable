@@ -126,6 +126,15 @@ class SupabaseClient:
         result = self._request("GET", f"{self.url}/rest/v1/{table}", params=params)
         return result or []
 
+    def delete(self, table: str, params: Dict[str, Any]) -> None:
+        """Delete rows matching PostgREST filters. RLS still applies."""
+        self._request(
+            "DELETE",
+            f"{self.url}/rest/v1/{table}",
+            params=params,
+            headers={"Prefer": "return=minimal"},
+        )
+
     # -- transport ----------------------------------------------------------
 
     def _request(

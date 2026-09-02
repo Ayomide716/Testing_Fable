@@ -1,0 +1,51 @@
+name: Supabase smoke test
+
+# Runs the one thing that cannot be tested offline: the live path through
+# anonymous sign-in, the pairing RPCs, RLS isolation and a full
+# encrypt → store → fetch → decrypt round trip.
+#
+# One-time setup — Settings → Secrets and variables → Actions → New repository
+# secret, twice:
+#   SUPABASE_URL        https://<project>.supabase.co
+#   SUPABASE_ANON_KEY   the anon public key (never the service_role key)
+#
+# The anon key is meant to be publishable — it ships inside client apps, and
+# RLS is what protects the data. Never put the service_role key here.
+#
+# Then: Actions → Supabase smoke test → Run workflow.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Live round trip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        working-directory: desktop
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check the secrets are present
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          missing=0
+          [ -n "$SUPABASE_URL" ] || { echo "::error::SUPABASE_URL secret is not set"; missing=1; }
+          [ -n "$SUPABASE_ANON_KEY" ] || { echo "::error::SUPABASE_ANON_KEY secret is not set"; missing=1; }
+          exit $missing
+
+      - name: Run the live smoke test
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: python desktop/tests/smoke_supabase.py
