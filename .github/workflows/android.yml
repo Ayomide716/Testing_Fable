@@ -20,6 +20,10 @@ on:
         description: 'Release to attach the APK to, e.g. v0.1.0'
         required: true
         default: 'v0.1.0'
+      expo_account:
+        description: 'Expo account that owns the EAS project'
+        required: true
+        default: 'ayfrosh2008'
 
 permissions:
   contents: write
@@ -63,6 +67,17 @@ jobs:
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+
+      # The app has no EAS project on a first run ("To create a new project:
+      # eas init"). This registers it and writes the project id into app.json
+      # for the build that follows; on later runs it links to the existing
+      # project of the same slug instead of creating a second one.
+      - name: Register the EAS project
+        working-directory: mobile
+        run: |
+          eas init --account "${{ inputs.expo_account }}" --non-interactive
+          # Record the id so the next step (and a later commit) can use it.
+          node -e "const c=require('./app.json'); console.log('projectId:', c.expo?.extra?.eas?.projectId ?? 'none')"
 
       # --wait blocks until Expo finishes. --output is rejected for cloud
       # builds ("--output is allowed only for local builds"), so the APK is
