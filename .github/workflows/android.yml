@@ -123,9 +123,45 @@ jobs:
           curl -fL --retry 3 "$url" -o ../clipsync-android.apk
           ls -lh ../clipsync-android.apk
 
+      # Uploaded through the REST API rather than action-gh-release: with an
+      # asset of this name already present the action takes an update path
+      # keyed on github.ref, which on a manual run is a branch and not a tag,
+      # and fails with "Resource not accessible by integration". Deleting the
+      # old asset and posting the new one needs only contents: write.
       - name: Attach it to the release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ inputs.release_tag }}
-          files: clipsync-android.apk
-          fail_on_unmatched_files: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.release_tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          api="https://api.github.com/repos/$REPO"
+          auth=(-H "Authorization: Bearer $GH_TOKEN"
+                -H "Accept: application/vnd.github+json")
+
+          release_id=$(curl -fsSL "${auth[@]}" "$api/releases/tags/$TAG" \
+            | node -e "process.stdin.on('data',d=>{const r=JSON.parse(d);process.stdout.write(String(r.id))})")
+          echo "release $TAG has id $release_id"
+
+          # Replace any previous APK so the download page keeps one clear link.
+          old=$(curl -fsSL "${auth[@]}" "$api/releases/$release_id/assets" \
+            | node -e "
+              let raw='';
+              process.stdin.on('data', d => raw += d);
+              process.stdin.on('end', () => {
+                const hit = JSON.parse(raw).find(a => a.name === 'clipsync-android.apk');
+                process.stdout.write(hit ? String(hit.id) : '');
+              });
+            ")
+          if [ -n "$old" ]; then
+            echo "deleting previous asset $old"
+            curl -fsSL -X DELETE "${auth[@]}" "$api/releases/assets/$old"
+          fi
+
+          echo "uploading $(du -h clipsync-android.apk | cut -f1)"
+          curl -fsSL -X POST "${auth[@]}" \
+            -H "Content-Type: application/vnd.android.package-archive" \
+            --data-binary @clipsync-android.apk \
+            "https://uploads.github.com/repos/$REPO/releases/$release_id/assets?name=clipsync-android.apk" \
+            -o /dev/null
+          echo "uploaded clipsync-android.apk to $TAG"
