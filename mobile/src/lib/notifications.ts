@@ -81,7 +81,9 @@ export async function notifyIncomingClip(
       body: 'New copied text received. Tap to copy.',
       data,
       categoryIdentifier: CLIPBOARD_CATEGORY,
-      sound: null,
+      // `false`, not `null`: expo types this as string | boolean, and a
+      // clipboard arriving should be quiet anyway.
+      sound: false,
       ...(Platform.OS === 'android' ? { channelId: CLIPBOARD_CHANNEL } : {}),
     },
     trigger: null, // deliver immediately
