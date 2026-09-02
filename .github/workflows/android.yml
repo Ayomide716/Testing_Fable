@@ -24,6 +24,10 @@ on:
         description: 'Expo account that owns the EAS project'
         required: true
         default: 'ayfrosh2008'
+      use_last_build:
+        description: 'Reuse the last finished EAS build instead of building again'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -95,39 +99,43 @@ jobs:
       # --wait blocks until Expo finishes. --output is rejected for cloud
       # builds ("--output is allowed only for local builds"), so the APK is
       # fetched from the artifact URL the build reports instead.
-      - name: Build the APK on EAS
+      #
+      # use_last_build reuses the most recent finished Android build rather
+      # than spending another quarter of an hour on an identical one — useful
+      # when only the upload half needs re-running.
+      - name: Get the APK from EAS
         working-directory: mobile
         run: |
-          set -o pipefail
-          eas build \
-            --platform android \
-            --profile preview \
-            --non-interactive \
-            --wait \
-            --json | tee build.json
+          set -euo pipefail
+          if [ "${{ inputs.use_last_build }}" = "true" ]; then
+            echo "reusing the last finished Android build"
+            eas build:list --platform android --status finished --limit 1 \
+              --non-interactive --json > build.json
+          else
+            eas build --platform android --profile preview \
+              --non-interactive --wait --json > build.json
+          fi
 
-          url=$(node -e "
-            const data = JSON.parse(require('fs').readFileSync('build.json', 'utf8'));
-            const build = Array.isArray(data) ? data[0] : data;
-            const art = build.artifacts || {};
-            const url = art.applicationArchiveUrl || art.buildUrl;
-            if (!url) {
-              console.error('build finished but reported no artifact url');
-              console.error(JSON.stringify(build, null, 2));
-              process.exit(1);
-            }
-            process.stdout.write(url);
-          ")
+          url=$(jq -r '(if type == "array" then .[0] else . end)
+                       | .artifacts.applicationArchiveUrl // .artifacts.buildUrl // empty' build.json)
+          if [ -z "$url" ]; then
+            echo "::error::the build reported no artifact url"
+            jq '.' build.json | head -60
+            exit 1
+          fi
 
-          echo "Downloading $url"
+          echo "downloading $url"
           curl -fL --retry 3 "$url" -o ../clipsync-android.apk
           ls -lh ../clipsync-android.apk
 
       # Uploaded through the REST API rather than action-gh-release: with an
       # asset of this name already present the action takes an update path
       # keyed on github.ref, which on a manual run is a branch and not a tag,
-      # and fails with "Resource not accessible by integration". Deleting the
-      # old asset and posting the new one needs only contents: write.
+      # and fails with "Resource not accessible by integration".
+      #
+      # Parsing is jq, not a node one-liner: the previous version parsed each
+      # stdin chunk, so the release JSON (larger than 8KB) failed with a
+      # SyntaxError at exactly position 8192.
       - name: Attach it to the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -139,29 +147,24 @@ jobs:
           auth=(-H "Authorization: Bearer $GH_TOKEN"
                 -H "Accept: application/vnd.github+json")
 
-          release_id=$(curl -fsSL "${auth[@]}" "$api/releases/tags/$TAG" \
-            | node -e "process.stdin.on('data',d=>{const r=JSON.parse(d);process.stdout.write(String(r.id))})")
+          release_id=$(curl -fsSL "${auth[@]}" "$api/releases/tags/$TAG" | jq -r '.id')
+          if [ -z "$release_id" ] || [ "$release_id" = "null" ]; then
+            echo "::error::no release found for tag $TAG"
+            exit 1
+          fi
           echo "release $TAG has id $release_id"
 
           # Replace any previous APK so the download page keeps one clear link.
           old=$(curl -fsSL "${auth[@]}" "$api/releases/$release_id/assets" \
-            | node -e "
-              let raw='';
-              process.stdin.on('data', d => raw += d);
-              process.stdin.on('end', () => {
-                const hit = JSON.parse(raw).find(a => a.name === 'clipsync-android.apk');
-                process.stdout.write(hit ? String(hit.id) : '');
-              });
-            ")
+                | jq -r '.[] | select(.name == "clipsync-android.apk") | .id')
           if [ -n "$old" ]; then
             echo "deleting previous asset $old"
-            curl -fsSL -X DELETE "${auth[@]}" "$api/releases/assets/$old"
+            curl -fsS -X DELETE "${auth[@]}" "$api/releases/assets/$old"
           fi
 
           echo "uploading $(du -h clipsync-android.apk | cut -f1)"
-          curl -fsSL -X POST "${auth[@]}" \
+          curl -fsS -X POST "${auth[@]}" \
             -H "Content-Type: application/vnd.android.package-archive" \
             --data-binary @clipsync-android.apk \
             "https://uploads.github.com/repos/$REPO/releases/$release_id/assets?name=clipsync-android.apk" \
-            -o /dev/null
-          echo "uploaded clipsync-android.apk to $TAG"
+            | jq -r '"uploaded \(.name) (\(.size) bytes, state \(.state))"'
